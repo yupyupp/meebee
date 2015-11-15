@@ -8,3 +8,8 @@
 #define ERR_OP_NOT_IMPL 0x07
 #define ERR_FILE_NOT_FOUND 0x08
 #define ERR_TO_FOLLOW 0x09
+
+#define CHNG_DATA_ITENT 0x00
+#define RETR_RQST 0x01
+#define STORE_REQUEST 0x02
+#define 

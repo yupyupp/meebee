@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -5,6 +7,7 @@
 #include <string.h>
 #include "../config.h"
 #include "../data/data.h"
+
 
 int autheticate(const char* username, const char*plainpass) {
     int pass = 0;

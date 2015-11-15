@@ -1,22 +1,12 @@
 # Author;	Stephen Haffner
 # makefile for meebee
 
-CC=gcc -ansi -pedantic -lpthreads 
+CC=gcc -lpthread -lcrypt
 OF=build/meebee.bin
 
-all: build/auth.o build/data.o build/crypto.o build/main.o
-	$(CC) main.o auth.o data.o crypto.o -o $(OF)
+all: main.c socket/socket.c data/data.c auth/auth.c
+	$(CC)  socket/socket.c data/data.c auth/auth.c main.c -o $(OF)
 
-build/main.o: main.c
-
-build/auth.o: auth/auth.c
-	$(CC) -c auth/auth.c
-
-build/data.o: data/data.c
-	$(CC) -c data/data.c
-
-build/crypto.o: crypto/crypto.c
-	$(CC) -lcrypt -lgcrypt -c crypto.c
 
 clean:
 	rm -rfv build/*.o build/meebee.bin

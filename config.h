@@ -1,5 +1,7 @@
 #define USERNAME_MAX 32
 
+#define USER_KEY_SIZE 4096
+
 #define SALTED_PASS_SIZE 21
 #define SALT_SIZE 12
 

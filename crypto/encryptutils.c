@@ -53,7 +53,9 @@ char* new_shash(char *password, char *salt) {
   return password;
 }
 
-/*generate a random salt*/
+/*generate a random salt
+ * TODO - not threadsafe randmness. look into tid and rand_r
+ * */
 void salt_generator(char** salt) {
   unsigned long seed[3];                                                                                                                              
   const char *const seedchars =                                                                     

@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "../config.h"
@@ -67,7 +68,7 @@ int spawn_socket(void) {
     /* create the socket */
     sock = make_socket(PORT);
     if (listen(sock, 1) < 0) {
-        //perror("Error creating socket");
+        perror("Error creating socket");
         return -1;
     }
     
@@ -112,6 +113,71 @@ int spawn_socket(void) {
     return 0;
 }
                     
+void* interpretMessage (void* sock_des) {
+    int done = 0;
+    ssize_t len;
+    char sock_buff[MAXMSG];
+
+    while (!done) {
+        len = recv(*(int*)sock_des, sock_buff, MAXMSG, 0);
+        if (len <= 0) {
+            if (len < 0) perror("recv");
+            done = 1;
+        }
+
+        if (!done) {
+            if (send(*(int*)sock_des, sock_buff, len, 0) < 0) {
+                perror("send");
+                done = 1;
+            }
+        }
+    }
+    close(*(int*)sock_des);
+}
+
+int spawn_MT_socket(void) {
+    int sock, connected, bytes_received, true = 1;
+    struct sockaddr_in server_addr, client_addr;
+    int sin_size;
+
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        perror("Socket");
+        exit(1);
+    }
+
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &true, sizeof (int)) == -1) {
+        perror("Setsockopt");
+        exit(1);
+    }
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    bzero(&(server_addr.sin_zero), 8);
+
+    if (bind(sock, (struct sockaddr *) &server_addr, sizeof (struct sockaddr)) == -1) { 
+        perror("Unable to bind");
+        exit(1);
+    }
 
 
+    if (listen(sock, 5) == -1) {
+        perror("Listen");
+        exit(1);
+    }
 
+    printf("\nTCPServer Waiting for client on port 5003");
+    fflush(stdout); 
+
+    while (1) {
+        /* Memory leak here. This child is never freed */
+        pthread_t *child = (pthread_t *)malloc( sizeof(pthread_t) );
+
+        sin_size = sizeof (struct sockaddr_in);
+        connected = accept(sock, (struct sockaddr *) &client_addr, &sin_size);
+        printf("\n I got a connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port)); 
+
+        pthread_create(child, NULL, interpretMessage, &connected);
+    }
+
+}

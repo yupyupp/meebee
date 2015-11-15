@@ -26,7 +26,7 @@ int main (int argc, char* argv[]) {
     /* Data reading initilization */
     data_init();
 
-    spawn_socket();
+    spawn_MT_socket();
 
     return 0;
 }

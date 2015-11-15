@@ -15,3 +15,8 @@
 
 #define PORT 61254
 #define MAXMSG 512
+
+#include "auth/auth.h"
+#include "socket/socket.h"
+#include "crypto/encryptutils.h"
+

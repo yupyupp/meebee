@@ -19,18 +19,12 @@
 #include <sys/types.h>
 
 /* Local project includes */
-#include "auth/auth.h"
-#include "data/data.h"
-#include "socket/socket.h"
 #include "config.h"
 
 int main (int argc, char* argv[]) {
 
     /* Data reading initilization */
     data_init();
-    
-    /* Encryption backend initilization */
-    /*gcry_control(GCRYCTL_SET_THREAD_CBS, 0);*/
 
     spawn_socket();
 

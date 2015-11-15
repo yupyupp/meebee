@@ -4,14 +4,21 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <crypt.h>
+#include <gcrypt.h>
 #include <string.h>
+#include <pthread.h>
+#include <semaphore.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
+#include "auth.h"
 #include "../config.h"
-#include "../data/data.h"
 #include "../crypto/encryptutils.h"
 
-int autheticate(const char* username, const char*plainpass) {
+
+
+
+
+int autheticate(char* username, char*plainpass) {
     int pass = 0;
     char* salt;
     char* spass_check; /* Salted version of the passed password */
@@ -68,7 +75,7 @@ int data_init() {
     return 0;
 }
 
-int add_user(const char* username, const char* spass, char* pri_salt){
+int add_user(char* username, char* spass, char* pri_salt){
     FILE* fp;
 
     pthread_mutex_lock(&write_mutex);
@@ -93,7 +100,7 @@ int add_user(const char* username, const char* spass, char* pri_salt){
     unsigned long e = RSA_F4;                                                                     
     BN_set_word(bne,e);                                                                             
     RSA_generate_key_ex(key, 1024, bne , NULL);
-    write_key(username, pri_salt, RSA);
+    write_key(username, pri_salt, key);
     RSA_free(key);
 
     pthread_mutex_lock(&write_mutex);
@@ -106,7 +113,7 @@ int add_user(const char* username, const char* spass, char* pri_salt){
     return 0;
 }
 
-int get_pass(const char* username, char** saltpass, char** salt) {
+int get_pass(char* username, char** saltpass, char** salt) {
     FILE* fp;
     char *s_user, *s_spass, *s_pub_key, *s_pri_key, *s_pri_salt;
     int error = 1;
@@ -152,4 +159,3 @@ int get_pass(const char* username, char** saltpass, char** salt) {
 
     return error;
 }
-

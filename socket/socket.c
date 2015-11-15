@@ -170,14 +170,13 @@ int spawn_MT_socket(void) {
     fflush(stdout); 
 
     while (1) {
-        /* Memory leak here. This child is never freed */
-        pthread_t *child = (pthread_t *)malloc( sizeof(pthread_t) );
+        pthread_t child;
 
         sin_size = sizeof (struct sockaddr_in);
         connected = accept(sock, (struct sockaddr *) &client_addr, &sin_size);
         printf("\n I got a connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port)); 
 
-        pthread_create(child, NULL, interpretMessage, &connected);
+        pthread_create(&child, NULL, interpretMessage, &connected);
     }
 
 }

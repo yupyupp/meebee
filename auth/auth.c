@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <crypt.h>
 #include <string.h>
 #include "../config.h"
@@ -18,7 +19,11 @@ int autheticate(const char* username, const char*plainpass) {
     
 
     /* Get stored password */
-    if (!get_pass(username, &spass_stored, &salt)) perror("Error getting password from database");
+    if (!get_pass(username, &spass_stored, &salt)) {
+        perror("Error getting password from database");
+        return -1;
+    }
+
 
     /* Salt plaintext password */
     cdata.initialized = 0;

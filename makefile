@@ -3,19 +3,20 @@
 
 CC=gcc -ansi -pedantic -lpthreads 
 OF=build/meebee.bin
-BD=build
 
-all: auth.o data.o crypto.o
-	$(CC) auth.o data.o crypto.o -o $(OF)
+all: build/auth.o build/data.o build/crypto.o build/main.o
+	$(CC) main.o auth.o data.o crypto.o -o $(OF)
 
-auth.o: auth/auth.c
-	$(CC) -c auth/auth.c -o $(BD)/auth.o
+build/main.o: main.c
 
-data.o: data/data.c
-	$(CC) -c data/data.c -o $(BD)/data.o
+build/auth.o: auth/auth.c
+	$(CC) -c auth/auth.c
 
-crypto.o: crypto/crypto.c
-	$(CC) -lcrypt -lgcrypt -c crypto.c -o $(BD)/crypto.o
+build/data.o: data/data.c
+	$(CC) -c data/data.c
+
+build/crypto.o: crypto/crypto.c
+	$(CC) -lcrypt -lgcrypt -c crypto.c
 
 clean:
 	rm -rfv build/*.o build/meebee.bin

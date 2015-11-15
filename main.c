@@ -11,6 +11,7 @@
 /* Local project includes */
 #include "auth/auth.h"
 #include "data/data.h"
+#include "socket/socket.h"
 #include "config.h"
 
 int main (int argc, char* argv[]) {
@@ -19,8 +20,9 @@ int main (int argc, char* argv[]) {
     data_init();
     
     /* Encryption backend initilization */
-    gcry_control(GCRYCTL_SET_THREAD_CBS, 0);
+    /*gcry_control(GCRYCTL_SET_THREAD_CBS, 0);*/
 
+    spawn_socket();
 
     return 0;
 }

@@ -47,11 +47,12 @@ int read_from_client(int filedes) {
     } else {
         /* Data reading */
         fprintf(stderr, "server: got messeg: %s\n", buffer);
+        write(filedes, "this is a test\n", 26);
     }
     return 0;
 }
 
-int main(void) {
+int spawn_socket(void) {
     extern int make_socket (uint16_t port);
     int sock;
     int i;
@@ -62,8 +63,8 @@ int main(void) {
     /* create the socket */
     sock = make_socket(PORT);
     if (listen(sock, 1) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
+        perror("Error creating socket");
+        return -1;
     }
     
     /* Initalize the set of active sockets */
@@ -75,7 +76,7 @@ int main(void) {
         read_fd_set = active_fd_set;
         if (select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
             perror( "select");
-            exit(EXIT_FAILURE);
+            return -1;
         }
 
         /* Service sockets with input pending */
@@ -88,7 +89,7 @@ int main(void) {
                 new = accept (sock, (struct sockaddr *) &clientname, (socklen_t *) &size); 
                 if (new < 0) { 
                     perror ("accept"); 
-                    exit (EXIT_FAILURE); 
+                    return -1;
                 } 
                 fprintf (stderr, 
                         "Server: connect from host %s, port %hd.\n", 
@@ -104,6 +105,7 @@ int main(void) {
             }
         }
     }
+    return 0;
 }
                     
 

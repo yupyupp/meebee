@@ -36,6 +36,7 @@ int read_from_client(int filedes) {
     int nbytes;
 
     nbytes = read (filedes, buffer, MAXMSG);
+    
 
     if (nbytes < 0) {
         /* Read error */
@@ -45,9 +46,12 @@ int read_from_client(int filedes) {
         /* EOF */
         return -1;
     } else {
+    if (nbytes < MAXMSG) {
+        buffer[nbytes-1] = '\0';
+    }
         /* Data reading */
         fprintf(stderr, "server: got messeg: %s\n", buffer);
-        write(filedes, "this is a test\n", 26);
+        write(filedes, "this is a test\n", 16);
     }
     return 0;
 }
@@ -63,7 +67,7 @@ int spawn_socket(void) {
     /* create the socket */
     sock = make_socket(PORT);
     if (listen(sock, 1) < 0) {
-        perror("Error creating socket");
+        //perror("Error creating socket");
         return -1;
     }
     

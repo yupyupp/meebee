@@ -4,19 +4,21 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <crypt.h>
-#include <gcrypt.h>
 #include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <openssl/rsa.h>
-#include <openssl/pem.h>
 #include "auth.h"
 #include "../config.h"
 #include "../crypto/encryptutils.h"
 
-
-
-
+int readcount;
+int writecount;
+pthread_mutex_t write_mutex;
+pthread_mutex_t read_mutex;
+sem_t read_block;
+sem_t write_block;
+sem_t write_pending;
 
 int autheticate(char* username, char*plainpass) {
     int pass = 0;
@@ -52,14 +54,6 @@ int autheticate(char* username, char*plainpass) {
     return pass;
 }
 
-int readcount;
-int writecount;
-pthread_mutex_t write_mutex;
-pthread_mutex_t read_mutex;
-sem_t read_block;
-sem_t write_block;
-sem_t write_pending;
-
 
 int data_init() {
     readcount = 0;
@@ -75,8 +69,25 @@ int data_init() {
     return 0;
 }
 
-int add_user(char* username, char* spass, char* pri_salt){
+int add_user(char* username, char* pass) {
     FILE* fp;
+    char* salt;
+    char* spass; /* salted password */
+    struct crypt_data cdata;
+
+
+    /* Allocating space for data */
+    salt = malloc(sizeof(char)*SALT_SIZE);
+    salt_generator(&salt);
+    
+   
+    /* Salt plaintext password */
+    cdata.initialized = 0;
+    spass = strdup(crypt_r(pass, salt, &cdata));
+
+    /* Generate new salt for private key */
+    salt_generator(&salt);
+
 
     pthread_mutex_lock(&write_mutex);
     writecount++;
@@ -87,9 +98,10 @@ int add_user(char* username, char* spass, char* pri_salt){
 
     sem_wait(&write_block);
 
+    /* write begin */
     fp = fopen(DATABASE_FILE, "a+");
 
-    fprintf(fp, "%s\t%s\t%s\n", username, spass, pri_salt);
+    fprintf(fp, "%s\t%s\t%s\n", username, spass, salt);
 
     fclose(fp);
     
@@ -99,9 +111,10 @@ int add_user(char* username, char* spass, char* pri_salt){
     BIGNUM* bne = BN_new();                                                                         
     unsigned long e = RSA_F4;                                                                     
     BN_set_word(bne,e);                                                                             
-    RSA_generate_key_ex(key, 1024, bne , NULL);
-    write_key(username, pri_salt, key);
+    RSA_generate_key_ex(key, USER_KEY_SIZE, bne , NULL);
+    write_key(username, strdup(crypt_r(pass, salt, &cdata)), key);
     RSA_free(key);
+    /* write end */
 
     pthread_mutex_lock(&write_mutex);
     writecount--;
@@ -109,6 +122,9 @@ int add_user(char* username, char* spass, char* pri_salt){
         sem_post(&read_block);
     }
     pthread_mutex_unlock(&write_mutex);
+
+    /* Free malloc'd variables */
+    free(salt);
 
     return 0;
 }

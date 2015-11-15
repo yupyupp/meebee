@@ -13,7 +13,10 @@ int autheticate(char* username, char*plainpass);
  */
 int data_init();
 
-int add_user(char* username, char* spass, char* salt);
+/**
+ * Add user and creates new key for the user
+ */
+int add_user(char* username, char* pass);
  
 /**
  * Gets the salted password and the salt used to salt it with

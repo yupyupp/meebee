@@ -1,5 +1,5 @@
-#ifndef encriptutils
-#define encriptutils
+#ifndef encryptutils
+#define encryptutils
 #include <gcrypt.h>
 #include <openssl/rsa.h>
 
@@ -19,7 +19,7 @@ int decrypt_private_key(char** priv_key, char** encrypted_priv_key, char* aesSym
 int encrypt_file(RSA* key, char* filename, char* data, int datalen);
 
 /*decrypts a file and returns a pointer to the file in memeory*/
-int decrypt_file(RSA* key, char* filename, char* data, int datalen);
+int decrypt_file(RSA* key, char* pfilename, char** data);
 
 /*generate a new public private keypair*/
 int gen_keypair(char* priv_key, char* pub_key, size_t key_len);

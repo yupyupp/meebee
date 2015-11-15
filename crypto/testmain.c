@@ -1,4 +1,4 @@
-#include "encriptutils.h"
+#include "encryptutils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,9 +41,12 @@ int main(void) {
     puts(test_priv_key);
 
     RSA* key = RSA_new();
-    BIGNUM* e = BN_new();
-    
-    RSA_generate_key_ex(key, 1024, e , NULL);
+    BIGNUM* bne = BN_new();
+    unsigned long   e = RSA_F4;
+    BN_set_word(bne,e);    
+    RSA_generate_key_ex(key, 1024, bne , NULL);
     encrypt_file(key, "/home/dgratz/test1232.txt", test_priv_key, strlen(test_priv_key));
+    decrypt_file(key, "/home/dgratz/test1232.txt", &test_priv_key);
+    puts(test_priv_key);
     RSA_free(key);
 }    

@@ -206,10 +206,4 @@ int get_pubkey(const char* username, char** pub_key) {
     return error;
 }
 
-
-
-    strncpy(filepath, DATA_ROOT, strlen(DATA_ROOT));                                                
-    strncpy(filepath + strlen(DATA_ROOT), username, strlen(username));
-    strncpy(filepath + strlen(DATA_ROOT), , 1);
-char* filepath= (char*)malloc(sizeof(char)*(strlen(DATA_ROOT)+strlen(username)+strlen(PRIV_KEY_FILE)+strlen(PUB_KEY_FILE)+1));             
  

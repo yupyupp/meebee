@@ -9,6 +9,7 @@
 #include <openssl/pem.h>
 
 #include "encryptutils.h"
+#include "../config.h"
 
 #define GCRY_CIPHER GCRY_CIPHER_AES128   // Pick the cipher here                                
 #define GCRY_C_MODE GCRY_CIPHER_MODE_ECB // Pick the cipher mode here  
@@ -235,15 +236,50 @@ int encrypt_private_key(char** priv_key, char** encrypted_priv_key, char* aesSym
     return 0;
 }
 
+int get_key_path(const char* user, char** pri_dir, char** pub_dir) {
+
+    *pri_dir = malloc(sizeof(char) * (strlen("DATA_ROOT") + strlen("PRI_KEY_FILE") + strlen(user)));
+    *pub_dir = malloc(sizeof(char) * (strlen("DATA_ROOT") + strlen("PUB_KEY_FILE") + strlen(user)));
+    snprintf(*pri_dir, sizeof(*pri_dir), "DATA_ROOT/%s/PRI_KEY_FILE", user);
+    snprintf(*pub_dir, sizeof(*pub_dir), "DATA_ROOT/%s/PUB_KEY_FILE", user);
+}
+
 int write_key(char* user, char* spass, RSA* keypair) {
 
     FILE* pub_file;
     FILE* pri_file;
+    char* pub_filestr;
+    char* pri_filestr;
 
-    pub_file = fopen(keydir, "w+");
-    pri_file - fopen(keydir, "w+");
+    get_key_path(user, &pri_filestr, &pub_filestr);
+
+
+    pub_file = fopen(pub_filestr, "w+");
+    pri_file = fopen(pri_filestr, "w+");
 
     PEM_write_RSAPublicKey(pub_file, keypair);
-    PEM_write_RSAPrivateKey(pri_file, PEM_ALG, spass, SALTED_PASS_SIZE, NULL, void *u);
+    PEM_write_RSAPrivateKey(pri_file, keypair, PEM_ALG, spass, SALTED_PASS_SIZE, NULL, NULL);
+    
+    fclose(pub_file);
+    fclose(pri_file);
 }
 
+int read_key(char* user, char* spass, RSA* keypair) {
+
+    FILE* pub_file;
+    FILE* pri_file;
+    char* pub_filestr;
+    char* pri_filestr;
+
+    get_key_path(user, &pri_filestr, &pub_filestr);
+
+
+    pub_file = fopen(pub_filestr, "w+");
+    pri_file = fopen(pri_filestr, "w+");
+
+    PEM_read_RSAPublicKey(pub_file, &keypair, NULL, spass);
+    PEM_read_RSAPrivateKey(pri_file, &keypair, NULL, spass);
+    
+    fclose(pub_file);
+    fclose(pri_file);
+}

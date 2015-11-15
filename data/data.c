@@ -32,6 +32,7 @@ int data_init() {
 
 int add_user(const char* username, const char* spass, const char* pub_key, const char* pri_key, char* pri_salt){
     FILE* fp;
+    char** pri_salt;
 
     pthread_mutex_lock(&write_mutex);
     writecount++;
@@ -50,6 +51,13 @@ int add_user(const char* username, const char* spass, const char* pub_key, const
     
     sem_post(&write_block);
 
+    RSA* key = RSA_new();                                                                           
+    BIGNUM* bne = BN_new();                                                                         
+    unsigned long   e = RSA_F4;                                                                     
+    BN_set_word(bne,e);                                                                             
+    RSA_generate_key_ex(key, 1024, bne , NULL);
+       write_key(username, pri_salt, RSA);
+    RSA_free(key);
 
     pthread_mutex_lock(&write_mutex);
     writecount--;
@@ -197,3 +205,11 @@ int get_pubkey(const char* username, char** pub_key) {
 
     return error;
 }
+
+
+
+    strncpy(filepath, DATA_ROOT, strlen(DATA_ROOT));                                                
+    strncpy(filepath + strlen(DATA_ROOT), username, strlen(username));
+    strncpy(filepath + strlen(DATA_ROOT), , 1);
+char* filepath= (char*)malloc(sizeof(char)*(strlen(DATA_ROOT)+strlen(username)+strlen(PRIV_KEY_FILE)+strlen(PUB_KEY_FILE)+1));             
+ 

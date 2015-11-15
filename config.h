@@ -7,3 +7,6 @@
 
 #define DATA_ROOT /opt/meebee/
 #define DATABASE_FILE "DATA_ROOT/users.db"
+
+#define PORT 61254
+#define MAXMSG 512

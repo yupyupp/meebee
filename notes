@@ -1,0 +1,2 @@
+use libgpgme-pth
+call gpgme_check_version FIRST

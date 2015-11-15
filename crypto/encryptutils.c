@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
@@ -238,10 +239,15 @@ int encrypt_private_key(char** priv_key, char** encrypted_priv_key, char* aesSym
 
 int get_key_path(const char* user, char** pri_dir, char** pub_dir) {
 
-    *pri_dir = malloc(sizeof(char) * (strlen("DATA_ROOT") + strlen("PRI_KEY_FILE") + strlen(user)));
-    *pub_dir = malloc(sizeof(char) * (strlen("DATA_ROOT") + strlen("PUB_KEY_FILE") + strlen(user)));
-    snprintf(*pri_dir, sizeof(*pri_dir), "DATA_ROOT/%s/PRI_KEY_FILE", user);
-    snprintf(*pub_dir, sizeof(*pub_dir), "DATA_ROOT/%s/PUB_KEY_FILE", user);
+    printf("thingz: %i\n", sizeof(char) * (strlen(DATA_ROOT) + strlen(PRI_KEY_FILE) + strlen(user)));
+    *pri_dir = malloc(sizeof(char) * (strlen(DATA_ROOT) + strlen(PRI_KEY_FILE) + strlen(user))+3);
+    *pub_dir = malloc(sizeof(char) * (strlen(DATA_ROOT) + strlen(PUB_KEY_FILE) + strlen(user))+3);
+    snprintf(*pri_dir, sizeof(char) * (strlen(DATA_ROOT) + strlen(PRI_KEY_FILE) + strlen(user))+3, "%s/%s/%s", DATA_ROOT, user, PRI_KEY_FILE);
+    snprintf(*pub_dir, sizeof(char) * (strlen(DATA_ROOT) + strlen(PUB_KEY_FILE) + strlen(user))+3 , "%s/%s/%s", DATA_ROOT, user, PUB_KEY_FILE);
+    printf("%s\n", *pri_dir);
+    puts(*pub_dir);
+    puts(*pri_dir);
+
 }
 
 int write_key(char* user, char* spass, RSA* keypair) {
@@ -257,11 +263,15 @@ int write_key(char* user, char* spass, RSA* keypair) {
     pub_file = fopen(pub_filestr, "w+");
     pri_file = fopen(pri_filestr, "w+");
 
+
+
     PEM_write_RSAPublicKey(pub_file, keypair);
     PEM_write_RSAPrivateKey(pri_file, keypair, PEM_ALG, spass, SALTED_PASS_SIZE, NULL, NULL);
     
     fclose(pub_file);
     fclose(pri_file);
+    free(pub_filestr);
+    free(pri_filestr);
 }
 
 int read_key(char* user, char* spass, RSA* keypair) {
@@ -276,10 +286,14 @@ int read_key(char* user, char* spass, RSA* keypair) {
 
     pub_file = fopen(pub_filestr, "w+");
     pri_file = fopen(pri_filestr, "w+");
+    puts(pub_filestr);
+    puts(pri_filestr);
 
     PEM_read_RSAPublicKey(pub_file, &keypair, NULL, spass);
     PEM_read_RSAPrivateKey(pri_file, &keypair, NULL, spass);
     
     fclose(pub_file);
     fclose(pri_file);
+    free(pub_filestr);
+    free(pri_filestr);
 }

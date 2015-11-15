@@ -30,7 +30,7 @@ int autheticate(const char* username, const char*plainpass) {
 
     /* Salt plaintext password */
     cdata.initialized = 0;
-    *spass_check = strdup(crypt_r(plainpass, salt, &cdata));
+    spass_check = strdup(crypt_r(plainpass, salt, &cdata));
     
     /* Check for equality */
     pass = !strcmp(spass_check, spass_stored);
@@ -42,5 +42,3 @@ int autheticate(const char* username, const char*plainpass) {
     
     return pass;
 }
-
-

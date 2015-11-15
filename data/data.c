@@ -90,6 +90,10 @@ int get_pass(const char* username, char** saltpass, char** salt) {
             break;
         }
     }
+    *saltpass = s_spass;
+    
+    *salt = malloc(sizeof(char)*SALT_SIZE);
+    strncpy(*salt, s_spass, SALT_SIZE);
 
     fclose(fp);
     /* Finished Reading */
@@ -133,6 +137,9 @@ int get_prikey(const char* username, char** pri_key, char** pri_salt) {
             break;
         }
     }
+
+    *pri_key = s_pri_key;
+    *pri_salt = s_pri_salt;
 
     fclose(fp);
     /* Finished Reading */

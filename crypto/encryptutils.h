@@ -24,4 +24,10 @@ int decrypt_file(RSA* key, char* pfilename, char** data);
 /*generate a new public private keypair*/
 int gen_keypair(char* priv_key, char* pub_key, size_t key_len);
 
+/* read keypair from a file */
+int read_key(char* user, char* spass, RSA* keypair);
+
+/* write keypair to a file */
+int write_key(char* user, char* spass, RSA* keypair);
+
 #endif

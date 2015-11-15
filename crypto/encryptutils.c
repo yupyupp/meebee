@@ -233,3 +233,15 @@ int encrypt_private_key(char** priv_key, char** encrypted_priv_key, char* aesSym
     return 0;
 }
 
+int write_key(char* user, char* spass, RSA* keypair) {
+
+    FILE* pub_file;
+    FILE* pri_file;
+
+    pub_file = fopen(keydir, "w+");
+    pri_file - fopen(keydir, "w+");
+
+    PEM_write_RSAPublicKey(pub_file, keypair);
+    PEM_write_RSAPrivateKey(pri_file, PEM_ALG, spass, SALTED_PASS_SIZE, NULL, void *u);
+}
+

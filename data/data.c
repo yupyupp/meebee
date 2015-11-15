@@ -30,9 +30,9 @@ int data_init() {
     return 0;
 }
 
-int add_user(const char* username, const char* spass, const char* pub_key, const char* pri_key, char* pri_salt){
+int add_user(const char* username, const char* spass){
     FILE* fp;
-    char** pri_salt;
+    char* pri_salt;
 
     pthread_mutex_lock(&write_mutex);
     writecount++;
@@ -44,8 +44,9 @@ int add_user(const char* username, const char* spass, const char* pub_key, const
     sem_wait(&write_block);
 
     fp = fopen(DATABASE_FILE, "a+");
+    salt_generator(&pri_salt);
 
-    fprintf(fp, "%s\t%s\t%s\t%s\t%s\n", username, spass, pub_key, pri_key,pri_salt);
+    fprintf(fp, "%s\t%s\t%s\n", username, spass, pri_salt);
 
     fclose(fp);
     
@@ -53,10 +54,10 @@ int add_user(const char* username, const char* spass, const char* pub_key, const
 
     RSA* key = RSA_new();                                                                           
     BIGNUM* bne = BN_new();                                                                         
-    unsigned long   e = RSA_F4;                                                                     
+    unsigned long e = RSA_F4;                                                                     
     BN_set_word(bne,e);                                                                             
     RSA_generate_key_ex(key, 1024, bne , NULL);
-       write_key(username, pri_salt, RSA);
+    write_key(username, pri_salt, RSA);
     RSA_free(key);
 
     pthread_mutex_lock(&write_mutex);
@@ -116,100 +117,3 @@ int get_pass(const char* username, char** saltpass, char** salt) {
     return error;
 }
 
-int get_prikey(const char* username, char** pri_key, char** pri_salt) {
-    FILE* fp;
-    char *s_user, *s_spass, *s_pub_key, *s_pri_key, *s_pri_salt;
-    int error = 1;
-
-    sem_wait(&write_pending);
-    sem_wait(&read_block);
-
-
-    pthread_mutex_lock(&read_mutex);
-    readcount++;
-    if (readcount == 1) {
-        sem_wait(&write_block);
-    }
-    pthread_mutex_unlock(&read_mutex);
-
-    /* Read */
-    sem_post(&write_pending);
-
-    fp = fopen(DATABASE_FILE, "r");
-
-    while (!feof(fp) && !strcmp(username, s_user)) {
-
-        fscanf(fp, "%s\t%s\t%s\t%s\t%s\n", s_user, s_spass, s_pub_key, s_pri_key, s_pri_salt);
-        if (!strcmp(username, s_user)) {
-            error = 0;
-            break;
-        }
-    }
-
-    *pri_key = s_pri_key;
-    *pri_salt = s_pri_salt;
-
-    fclose(fp);
-    /* Finished Reading */
-
-    pthread_mutex_lock(&read_mutex);
-    readcount--;
-    if(readcount == 0) {
-        sem_post(&write_block);
-    }
-    pthread_mutex_unlock(&read_mutex);
-
-    return error;
-}
-
-int get_pubkey(const char* username, char** pub_key) {
-    FILE* fp;
-    char *s_user, *s_spass, *s_pub_key, *s_pri_key, *s_pri_salt;
-    int error = 1;
-
-    sem_wait(&write_pending);
-    sem_wait(&read_block);
-
-
-    pthread_mutex_lock(&read_mutex);
-    readcount++;
-    if (readcount == 1) {
-        sem_wait(&write_block);
-    }
-    pthread_mutex_unlock(&read_mutex);
-
-    /* Read */
-    sem_post(&write_pending);
-
-    fp = fopen(DATABASE_FILE, "r");
-
-    while (!feof(fp) ) {
-
-        fscanf(fp, "%s\t%s\t%s\t%s\t%s\n", s_user, s_spass, s_pub_key, s_pri_key, s_pri_salt);
-        if (!strcmp(username, s_user)) {
-            error = 0;
-            break;
-        }
-    }
-    *pub_key = s_pub_key;
-
-    fclose(fp);
-    /* Finished Reading */
-
-    pthread_mutex_lock(&read_mutex);
-    readcount--;
-    if(readcount == 0) {
-        sem_post(&write_block);
-    }
-    pthread_mutex_unlock(&read_mutex);
-
-    return error;
-}
-
-
-
-    strncpy(filepath, DATA_ROOT, strlen(DATA_ROOT));                                                
-    strncpy(filepath + strlen(DATA_ROOT), username, strlen(username));
-    strncpy(filepath + strlen(DATA_ROOT), , 1);
-char* filepath= (char*)malloc(sizeof(char)*(strlen(DATA_ROOT)+strlen(username)+strlen(PRIV_KEY_FILE)+strlen(PUB_KEY_FILE)+1));             
- 

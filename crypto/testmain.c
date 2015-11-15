@@ -1,4 +1,5 @@
 #include "encryptutils.h"
+#include "auth.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -49,4 +50,6 @@ int main(void) {
     decrypt_file(key, "/home/dgratz/test1232.txt", &test_priv_key);
     puts(test_priv_key);
     RSA_free(key);
+
+    
 }    

@@ -15,7 +15,8 @@
 
 /* socket defines */
 #define PORT 61254
-#define MAXMSG 512
+#define MAXMSG 1024
+#define SOCKET_BUFFER 32
 
 #include "auth/auth.h"
 #include "socket/socket.h"

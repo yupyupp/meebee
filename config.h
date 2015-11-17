@@ -1,7 +1,9 @@
 /* string sizes */
 #define USERNAME_MAX 32
+#define PASSWORD_MAX 32
 #define SALTED_PASS_SIZE 21
 #define SALT_SIZE 12
+#define FILENAME_MAX 64
 
 /* Crypto defines */
 #define USER_KEY_SIZE 4096

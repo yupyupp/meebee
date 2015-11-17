@@ -1,3 +1,5 @@
+/* need a new way to get the salt for the shash and call it get_salt(char* username)*/
+
 /**
  * Checks if the given username and painpassword are valid
  *
